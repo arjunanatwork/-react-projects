@@ -7,14 +7,21 @@ import StartScreen from "./StartScreen";
 import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
+import FinishScreen from "./FinishScreen";
+import Footer from "./Footer";
+import Timer from "./Timer";
 
 const initialState = {
     questions: [],
     status: 'loading',
     index: 0,
     answer: null,
-    points: 0
+    points: 0,
+    highscore: 0,
+    secondsRemaining: null
 }
+
+const SECS_PER_QUESTION = 30;
 
 function reducer(state = initialState, action) {
     switch (action.type) {
@@ -23,7 +30,7 @@ function reducer(state = initialState, action) {
         case 'dataFailed':
             return {...state, status: 'error'};
         case 'start':
-            return {...state, status: 'active'};
+            return {...state, status: 'active', secondsRemaining: state.questions.length * SECS_PER_QUESTION};
         case 'newAnswer':
             const question = state.questions.at(state.index);
             return {
@@ -32,6 +39,20 @@ function reducer(state = initialState, action) {
             };
         case 'nextQuestion':
             return {...state, index: state.index + 1, answer: null};
+        case 'finish':
+            return {
+                ...state,
+                status: "finished",
+                highscore: state.points > state.highscore ? state.points : state.highscore
+            };
+        case 'restart':
+            return {...initialState, questions: state.questions, status: 'ready'};
+        case 'tick':
+            return {
+                ...state,
+                secondsRemaining: state.secondsRemaining - 1,
+                status: state.secondsRemaining === 0 ? "finished" : state.status
+            };
         default:
             throw new Error(`Unhandled action type ${action.type}`);
     }
@@ -40,7 +61,15 @@ function reducer(state = initialState, action) {
 
 export default function App() {
 
-    const [{questions, status, index, answer, points}, dispatch] = useReducer(reducer, initialState);
+    const [{
+        questions,
+        status,
+        index,
+        answer,
+        points,
+        highscore,
+        secondsRemaining
+    }, dispatch] = useReducer(reducer, initialState);
 
     const numQuestions = questions.length;
     const maxPossiblePoints = questions.reduce((prev, curr) => prev + curr.points, 0);
@@ -48,7 +77,7 @@ export default function App() {
         fetch("http://localhost:9000/questions")
             .then((res) => res.json())
             .then((data) => dispatch({type: 'dataReceived', payload: data}))
-            .catch((err) => dispatch({type: 'dataFailed'}));
+            .catch(() => dispatch({type: 'dataFailed'}));
     }, []);
 
     return (<div className="app">
@@ -62,10 +91,17 @@ export default function App() {
                     <Progress numQuestions={numQuestions} index={index} points={points}
                               maxPossiblePoints={maxPossiblePoints} answer={answer}/>
                     <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
-                    <NextButton dispatch={dispatch} answer={answer}/>
+                    <Footer>
+                        <Timer dispatch={dispatch} secondsRemaining={secondsRemaining}/>
+                        <NextButton dispatch={dispatch} answer={answer} numQuestions={numQuestions} index={index}/>
+                    </Footer>
+
                 </>
             )
             }
+            {status === 'finished' &&
+                <FinishScreen points={points} maxPossiblePoints={maxPossiblePoints} highscore={highscore}
+                              dispatch={dispatch}/>}
         </Main>
     </div>);
 }
