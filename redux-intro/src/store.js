@@ -1,12 +1,13 @@
-import {applyMiddleware, combineReducers, createStore} from "redux";
-import accountReducer from "./features/account/accountSlice";
+import {configureStore} from "@reduxjs/toolkit";
+
+import accountReducer from "./features/accounts/accountSlice";
 import customerReducer from "./features/customers/customerSlice";
-import {createLogger} from "redux-logger/src";
-import {thunk} from "redux-thunk";
 
-const logger = createLogger({});
-
-const rootReducer = combineReducers({account: accountReducer, customer: customerReducer})
-const store = createStore(rootReducer, applyMiddleware(thunk, logger));
+const store = configureStore({
+    reducer: {
+        account: accountReducer,
+        customer: customerReducer,
+    },
+});
 
 export default store;

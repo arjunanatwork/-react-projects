@@ -1,7 +1,7 @@
 import CreateCustomer from "./features/customers/CreateCustomer";
 import Customer from "./features/customers/Customer";
-import AccountOperations from "./features/account/AccountOperations";
-import BalanceDisplay from "./features/account/BalanceDisplay";
+import AccountOperations from "./features/accounts/AccountOperations";
+import BalanceDisplay from "./features/accounts/BalanceDisplay";
 import {useSelector} from "react-redux";
 
 function App() {
