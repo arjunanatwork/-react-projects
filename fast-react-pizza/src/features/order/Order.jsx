@@ -8,7 +8,7 @@ import OrderItem from './OrderItem.jsx';
 function Order() {
   const order = useLoaderData();
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
-  const { id, status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order;
+  const { status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order;
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
   return (
@@ -40,8 +40,8 @@ function Order() {
       </div>
 
       <ul className='dive-stone-200 divide-y border-b border-t'>
-        {cart.map((item, index) => (
-          <OrderItem item={item} key={item.id} />
+        {cart.map((item) => (
+          <OrderItem item={item} key={item.pizzaId} />
         ))}
       </ul>
 
