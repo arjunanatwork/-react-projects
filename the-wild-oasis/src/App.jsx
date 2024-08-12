@@ -4,7 +4,6 @@ import Button from "./ui/Button.jsx";
 import Input from "./ui/Input.jsx";
 import Heading from "./ui/Heading.jsx";
 
-
 const StyledApp = styled.div`
     background-color: orangered;
     padding: 20px;
